@@ -66,16 +66,13 @@
         (define frame-mixin
           (mixin (drracket:unit:frame<%>) ()
             (super-new)
-            (inherit add-show-menu-items get-show-menu get-definitions-text)
-            (define (update-image!)
-              (send (get-definitions-text) invalidate-bitmap-cache 0.0 0.0 'display-end 'display-end))
+            (inherit add-show-menu-items get-show-menu) 
             (define set-background (new menu-item% [parent (get-show-menu)][label "Set Background"]
                                         [callback (lambda (a b) (define f (get-file))
                                                     (when f (put-preferences
                                                              '(drracket-background)
                                                              (list (path->string f)))
-                                                      (load-file!)
-                                                      (update-image!))
+                                                      (load-file!))
                                                     )]))
 
             (define set-alignment (new menu-item% [parent (get-show-menu)][label "Set Background Alignment"]
@@ -92,8 +89,7 @@
                               [callback (lambda (c e) (put-preferences '(drracket-background-alignmentH)
                                                                        (list (if (eq? (send c get-selection) 1)
                                                                                  'right
-                                                                                 'left)))
-                                          (update-image!))]
+                                                                                 'left))))]
                               ))
             (define setV (new choice% [label "Vertical Alignment"]
                               [choices '("top" "bottom")]
@@ -103,8 +99,7 @@
                               [callback (lambda (c e) (put-preferences '(drracket-background-alignmentV)
                                                                        (list (if (eq? (send c get-selection) 1)
                                                                                  'bottom
-                                                                                 'top)))
-                                          (update-image!))]
+                                                                                 'top))))]
                               ))
             
             ))
