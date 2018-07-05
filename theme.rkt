@@ -6,7 +6,8 @@
          drracket/tool
          racket/unit
          racket/class
-         racket/draw)
+         racket/draw
+         pict)
 (provide tool@)
 (define tool@
   (unit (import drracket:tool^)
@@ -16,7 +17,9 @@
         
         (define (load-file!)
           (define f (get-preference 'drracket-background))
-          (when f (image (read-bitmap f))))
+          (define scale-factor (get-preference 'drracket-background-scale-factor))
+          (define sf (if scale-factor scale-factor 100))
+          (when f (image (pict->bitmap (scale (bitmap f) (/ sf 100))))))
         
         (define (calc-start-point editor)
           (if (send editor get-canvas)
@@ -106,8 +109,23 @@
                                                                                  'top)))
                                           (update-image!))]
                               ))
+
+            (define set-scale-factor (new text-field% [label "Scale:"]
+                                          [parent set-frame]
+                                          [init-value (let ([f (get-preference 'drracket-background-scale-factor)])
+                                                        (if f (number->string f) "100"))]
+                                                      ))
+            (define set-scale-button (new button% [label "Set Scale"]
+                                          [parent set-frame]
+                                          [callback (λ (c e)
+                                                      (define v (string->number (send set-scale-factor get-value)))
+                                                      (when (exact-positive-integer? v)
+                                                          (put-preferences '(drracket-background-scale-factor)
+                                                                           (list v))
+                                                        (load-file!) (update-image!)))]))
+            )
             
-            ))
+            )
           
         (drracket:get/extend:extend-definitions-text background-mixin)
         (drracket:get/extend:extend-unit-frame frame-mixin)
